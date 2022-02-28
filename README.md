@@ -1,6 +1,13 @@
 # autogeneratemodel
 
-Automatically generate model
+使用递归来实现多层model，理论上支持三层以上的json，但是没测试过，之后慢慢优化修改。
+支持用户自选路径，在自选路径下存在同名文件时将有一个参数控制是否覆盖文件。
+
+后续应该会给打包出来作为一个小工具使用，目前考虑的是：
+-支持定义文件名
+-定义class名称
+-是否将所有非List参数修改为String
+-是否需要增加final关键字
 
 ## Getting Started
 
