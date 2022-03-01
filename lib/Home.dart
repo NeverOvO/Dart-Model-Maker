@@ -30,7 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
-
+          // String? selectedDirectory = await FilePicker.platform.getDirectoryPath();// file_picker: ^4.4.0
           _readJSON();
 
         },
@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //读取文件与测试用例
   _readJSON() async{
 
-    File file = File("/Volumes/mac/Users/biex/Downloads/autogeneratemodel/lib/josn.json");
+    File file = File("/Volumes/mac/Users/biex/Downloads/autogeneratemodel/lib/json.json");
     String str = await file.readAsString();
     Map _jsonMap = jsonDecode(str);
     _makeModel(_jsonMap);
@@ -107,7 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
   _disassemblyModel(Map map,int insideMapLength,{String rootModelName = 'Automatic' , bool allString = false}){
 
     List modelList = [];
-    List _resultList = [];
     int modelListLength = 0;
 
     String _insideMapTitle = 'Model';
@@ -135,13 +134,21 @@ class _MyHomePageState extends State<MyHomePage> {
     map.forEach((key, value){
       //第一步，解析完成所有的key，并生成第一次的参数
       if(value.runtimeType != List){
-        modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+        if(value is Map){
+          //如果是Map类型进行一次解析
+          {
+            List _resultList = _disassemblyModel(value,insideMapLength,rootModelName: (key.toString() + 'Map'),allString: allString);
+            modelList.addAll(_resultList);
+          }
+          modelList.insert(modelListLength++, "\tfinal " + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");//"final int? code;"
+
+        }else{
+          modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+        }
       }else{
         //进行递归的第二层
-        // _resultList = await _disassemblyModel(map,_recursionKey,rootModelName: _modelRootName);
         List vv = value;
         Map _insideMap;
-
         if(vv.first is Map){
           _insideMap = vv.first;
         }else if(vv.first is String){
@@ -151,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         {
-          _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: rootModelName,allString: allString);
+          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: rootModelName,allString: allString);
           modelList.addAll(_resultList);
         }
 
@@ -173,10 +180,15 @@ class _MyHomePageState extends State<MyHomePage> {
     modelList.insert(modelListLength++, "\t\treturn " + rootModelName + _insideMapTitle +"(");//"final int? code;"
     map.forEach((key, value) {
       if(value.runtimeType != List){
-        if(key.runtimeType == String || allString){
-          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'].toString(),");
+        if(value is Map){//json['mapD'] != null ? new MapD.fromJson(json['mapD']) : null;
+          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : "
+              + "json['" + key.toString() + "'] != null ? " + key.toString() + 'Map' + _insideMapTitle + ".fromJson(json['" + key.toString() + "']) : null,");
         }else{
-          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'],");
+          if(key.runtimeType == String || allString){
+            modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'].toString(),");
+          }else{
+            modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'],");
+          }
         }
       }else{
         modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + rootModelName + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
@@ -185,7 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
     modelList.insert(modelListLength++, "\t\t);");//"final int? code;"
     modelList.insert(modelListLength++, "\t}");//"final int? code;"
     modelList.insert(modelListLength++, "}");//"final int? code;"
-
+    modelList.insert(modelListLength++, "");
     return modelList;
   }
 
