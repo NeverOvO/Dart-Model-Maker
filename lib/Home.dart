@@ -120,10 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
       _insideMapTitle2 = 'ListData';
     }else if(insideMapLength == 3){
       _insideMapTitle = 'ListData';
-      _insideMapTitle2 = 'List' + (insideMapLength+1).toString() +'Data';
+      _insideMapTitle2 = 'Inside' + (insideMapLength+1).toString() +'Data';
     }else{
-      _insideMapTitle = 'List' + insideMapLength.toString() +'Data';
-      _insideMapTitle2 = 'List' + (insideMapLength+1).toString() +'Data';
+      _insideMapTitle = 'Inside' + insideMapLength.toString() +'Data';
+      _insideMapTitle2 = 'Inside' + (insideMapLength+1).toString() +'Data';
     }
 
     //新增头
