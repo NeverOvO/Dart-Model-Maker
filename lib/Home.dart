@@ -291,8 +291,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             onPressed: (){
-
-              // String? selectedDirectory = await FilePicker.platform.getDirectoryPath();// file_picker: ^4.4.0
               _readJSON();
             },
           ),
