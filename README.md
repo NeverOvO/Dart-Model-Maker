@@ -1,5 +1,4 @@
-# Dart Model Maker 
-# Dart模型制作
+# Dart模型制作 （Dart Model Maker ）
 
 使用递归来实现多层model，理论上支持三层以上的json，但是没测试过，之后慢慢优化修改。
 支持用户自选路径，在自选路径下存在同名文件时将有一个参数控制是否覆盖文件。
