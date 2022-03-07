@@ -471,7 +471,6 @@ class _MyHomePageState extends State<MyHomePage> {
     List _resultList = [];
     int _recursionKey = 1;
 
-    bool _allString = true;
 
     _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString, needFinal: needFinal);
 
@@ -484,11 +483,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+  //预览
   _previewModel(Map map,String modelRootName,bool allString , bool needFinal) async{
     List _resultList = [];
     int _recursionKey = 1;
 
-    bool _allString = true;
 
     _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString ,needFinal: needFinal);
 
@@ -497,10 +496,10 @@ class _MyHomePageState extends State<MyHomePage> {
     for (var it in _resultList) {
       _result += it + '\n';
     }
-
     setState(() {
       _modelPreviewJsonController.text = _result;
     });
+
   }
 
   //原json，递归层数，model根姓名，是否除List外全部使用String
