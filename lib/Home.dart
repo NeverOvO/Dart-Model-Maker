@@ -274,7 +274,40 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             onPressed: () async{
-              _readJSON();
+
+              if(_modelJsonController.text == ""){
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    action: SnackBarAction(label: "了解!",onPressed: (){
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                    },),
+                    content:const Text('请输入接口报文JSON',style: TextStyle(fontSize: 12),),
+                    backgroundColor: Colors.orange,
+                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  ),
+                );
+                return;
+              }
+
+              Map map = jsonDecode(_modelJsonController.text);
+
+              if(_modelRootNameController.text == ""){
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    action: SnackBarAction(label: "了解!",onPressed: (){
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                    },),
+                    content:const Text('请输入Model根名',style: TextStyle(fontSize: 12),),
+                    backgroundColor: Colors.orange,
+                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  ),
+                );
+                return;
+              }
+
+              _previewModel(map,_modelRootNameController.text,_allString,_needFinal);
             },
           ),
           const SizedBox(height: 10,),
@@ -291,7 +324,55 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             onPressed: (){
-              _readJSON();
+
+              if(_modelFileNameController.text == ""){
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    action: SnackBarAction(label: "了解!",onPressed: (){
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                    },),
+                    content:const Text('请输入文件名',style: TextStyle(fontSize: 12),),
+                    backgroundColor: Colors.orange,
+                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  ),
+                );
+                return;
+              }
+
+              if(_modelJsonController.text == ""){
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    action: SnackBarAction(label: "了解!",onPressed: (){
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                    },),
+                    content:const Text('请输入接口报文JSON',style: TextStyle(fontSize: 12),),
+                    backgroundColor: Colors.orange,
+                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  ),
+                );
+                return;
+              }
+
+              Map map = jsonDecode(_modelJsonController.text);
+
+              if(_modelRootNameController.text == ""){
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    action: SnackBarAction(label: "了解!",onPressed: (){
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                    },),
+                    content:const Text('请输入Model根名',style: TextStyle(fontSize: 12),),
+                    backgroundColor: Colors.orange,
+                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+                  ),
+                );
+                return;
+              }
+
+              _makeModel(map,_modelFileNameController.text,_modelRootNameController.text,_allString,_needFinal);
             },
           ),
           const SizedBox(height: 10,),
@@ -349,6 +430,17 @@ class _MyHomePageState extends State<MyHomePage> {
           print({'!!$_file文件已存在!!'});
         }
       }
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          action: SnackBarAction(label: "了解!",onPressed: (){
+            ScaffoldMessenger.of(context).clearSnackBars();
+          },),
+          content:const Text('Model文件创建成功',style: TextStyle(fontSize: 12),),
+          backgroundColor: Colors.green,
+          padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+        ),
+      );
     }catch(e){
       print(e);
     }
@@ -365,41 +457,40 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //读取文件与测试用例
-  _readJSON() async{
-
-    File file = File("/Volumes/mac/Users/biex/Downloads/autogeneratemodel/lib/json.json");
-    String str = await file.readAsString();
-    Map _jsonMap = jsonDecode(str);
-    // _makeModel(_jsonMap);
-    _previewModel(_jsonMap);
-  }
+  // _readJSON() async{
+  //
+  //   File file = File("/Volumes/mac/Users/biex/Downloads/autogeneratemodel/lib/json.json");
+  //   String str = await file.readAsString();
+  //   Map _jsonMap = jsonDecode(str);
+  //   // _makeModel(_jsonMap);
+  //   // _previewModel(_jsonMap);
+  // }
 
   //制作
-  _makeModel(Map map) async {
+  _makeModel(Map map,String fileName,String modelRootName,bool allString , bool needFinal) async {
     List _resultList = [];
     int _recursionKey = 1;
-    const String _modelRootName = 'neverRootResponse';
 
     bool _allString = true;
 
-    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: _modelRootName, allString: _allString);
+    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString, needFinal: needFinal);
 
     //第四步写入文件
     String _result = '';
     for (var it in _resultList) {
       _result += it + '\n';
     }
-    _createFile(_result, fileName: "automodel", fileOverwriteAlreadyExists: true);
+    _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: true);
+
   }
 
-  _previewModel(Map map) async{
+  _previewModel(Map map,String modelRootName,bool allString , bool needFinal) async{
     List _resultList = [];
     int _recursionKey = 1;
-    const String _modelRootName = 'neverRootResponse';
 
     bool _allString = true;
 
-    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: _modelRootName, allString: _allString);
+    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString ,needFinal: needFinal);
 
     //第四步写入文件
     String _result = '';
@@ -412,10 +503,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
-
   //原json，递归层数，model根姓名，是否除List外全部使用String
-  _disassemblyModel(Map map,int insideMapLength,{String rootModelName = 'Automatic' , bool allString = false}){
+  _disassemblyModel(Map map,int insideMapLength,{String rootModelName = 'Automatic' , bool allString = false ,bool needFinal = true}){
 
     List modelList = [];
     int modelListLength = 0;
@@ -448,13 +537,23 @@ class _MyHomePageState extends State<MyHomePage> {
         if(value is Map){
           //如果是Map类型进行一次解析
           {
-            List _resultList = _disassemblyModel(value,insideMapLength,rootModelName: (key.toString() + 'Map'),allString: allString);
+            List _resultList = _disassemblyModel(value,insideMapLength,rootModelName: (key.toString() + 'Map'),allString: allString , needFinal:  needFinal);
             modelList.addAll(_resultList);
           }
-          modelList.insert(modelListLength++, "\tfinal " + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");//"final int? code;"
+
+          if(needFinal){
+            modelList.insert(modelListLength++, "\tfinal " + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");
+          }else{
+            modelList.insert(modelListLength++, "\t" + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");
+          }
 
         }else{
-          modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+
+          if(needFinal){
+            modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+          }else{
+            modelList.insert(modelListLength++, "\t" + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+          }
         }
       }else{
         //进行递归的第二层
@@ -469,11 +568,16 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         {
-          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: rootModelName,allString: allString);
+          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: rootModelName,allString: allString ,needFinal: needFinal);
           modelList.addAll(_resultList);
         }
 
-        modelList.insert(modelListLength++, "\tfinal List<" + rootModelName + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+        if(needFinal){
+          modelList.insert(modelListLength++, "\tfinal List<" + rootModelName + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+        }else{
+          modelList.insert(modelListLength++, "\tList<" + rootModelName + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+        }
+
       }
     });
     modelList.insert(modelListLength++, "");
