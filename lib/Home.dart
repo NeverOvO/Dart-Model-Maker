@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const double myFontSize = 13;
 
@@ -163,17 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Text("允许文件覆盖",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
                   IconButton(
                     onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          action: SnackBarAction(label: "了解!",onPressed: (){
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                          },),
-                          content:const Text('启用此选项后，将允许直接覆盖同名文件；关闭后，将提示用户进行修改',style: TextStyle(fontSize: 12),),
-                          backgroundColor: Colors.orange,
-                          padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                        ),
-                      );
+                      _tipsBox('启用此选项后，将允许直接覆盖同名文件；关闭后，将提示用户进行修改',Colors.orange);
                     },
                     icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
                 ],
@@ -197,17 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Text("启用类型全String",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
                   IconButton(
                     onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                         SnackBar(
-                          action: SnackBarAction(label: "了解!",onPressed: (){
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                          },),
-                          content:const Text('启用此选项后，将除了List，Map类型外的其他参数类型转换为String类型；关闭后，将使用参数的原本类型',style: TextStyle(fontSize: 12),),
-                          backgroundColor: Colors.orange,
-                          padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                        ),
-                      );
+                      _tipsBox('启用此选项后，将除了List，Map类型外的其他参数类型转换为String类型；关闭后，将使用参数的原本类型',Colors.orange);
                     },
                     icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
                 ],
@@ -232,17 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Text("final修饰词",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
                   IconButton(
                     onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          action: SnackBarAction(label: "了解!",onPressed: (){
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                          },),
-                          content:const Text('启用此选项后，将在参数前添加final，例如final String? id；关闭后为String? id',style: TextStyle(fontSize: 12),),
-                          backgroundColor: Colors.orange,
-                          padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                        ),
-                      );
+                      _tipsBox('启用此选项后，将在参数前添加final，例如final String? id；关闭后为String? id',Colors.orange);
                     },
                     icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
                 ],
@@ -263,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           ElevatedButton(
             child: Container(
-              child: const Text("生成预览",maxLines: 1,overflow: TextOverflow.ellipsis,softWrap: true,),
+              child: const Text("生成预览(长按复制)",maxLines: 1,overflow: TextOverflow.ellipsis,softWrap: true,),
               padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
               alignment: Alignment.center,
             ),
@@ -276,38 +247,34 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () async{
 
               if(_modelJsonController.text == ""){
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    action: SnackBarAction(label: "了解!",onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    },),
-                    content:const Text('请输入接口报文JSON',style: TextStyle(fontSize: 12),),
-                    backgroundColor: Colors.orange,
-                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  ),
-                );
+                _tipsBox('请输入接口报文JSON',Colors.orange);
                 return;
               }
 
-              Map map = jsonDecode(_modelJsonController.text);
+              Map _jsonMap;
+              try{
+                _jsonMap = jsonDecode(_modelJsonController.text);
+              }catch(e){
+                _tipsBox('JSON转Map失败，请检查JSON字符串格式',Colors.red[400]!);
+                return;
+              }
 
               if(_modelRootNameController.text == ""){
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    action: SnackBarAction(label: "了解!",onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    },),
-                    content:const Text('请输入Model根名',style: TextStyle(fontSize: 12),),
-                    backgroundColor: Colors.orange,
-                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  ),
-                );
+                _tipsBox('请输入Model根名',Colors.orange);
                 return;
               }
 
-              _previewModel(map,_modelRootNameController.text,_allString,_needFinal);
+              _previewModel(_jsonMap,_modelRootNameController.text,_allString,_needFinal);
+            },
+
+            onLongPress: (){
+              if(_modelPreviewJsonController.text == ''){
+                _tipsBox('请先单击生成预览',Colors.red[400]!);
+                return;
+              }
+
+              Clipboard.setData(ClipboardData(text: _modelPreviewJsonController.text));
+              _tipsBox('复制成功', Colors.green);
             },
           ),
           const SizedBox(height: 10,),
@@ -326,53 +293,29 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: (){
 
               if(_modelFileNameController.text == ""){
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    action: SnackBarAction(label: "了解!",onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    },),
-                    content:const Text('请输入文件名',style: TextStyle(fontSize: 12),),
-                    backgroundColor: Colors.orange,
-                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  ),
-                );
+                _tipsBox('请输入文件名', Colors.orange);
                 return;
               }
 
               if(_modelJsonController.text == ""){
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    action: SnackBarAction(label: "了解!",onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    },),
-                    content:const Text('请输入接口报文JSON',style: TextStyle(fontSize: 12),),
-                    backgroundColor: Colors.orange,
-                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  ),
-                );
+                _tipsBox('请输入接口报文JSON', Colors.orange);
                 return;
               }
 
-              Map map = jsonDecode(_modelJsonController.text);
+              Map _jsonMap;
+              try{
+                _jsonMap = jsonDecode(_modelJsonController.text);
+              }catch(e){
+                _tipsBox('JSON转Map失败，请检查JSON字符串格式', Colors.red[400]!);
+                return;
+              }
 
               if(_modelRootNameController.text == ""){
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    action: SnackBarAction(label: "了解!",onPressed: (){
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                    },),
-                    content:const Text('请输入Model根名',style: TextStyle(fontSize: 12),),
-                    backgroundColor: Colors.orange,
-                    padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-                  ),
-                );
+                _tipsBox('请输入Model根名', Colors.orange);
                 return;
               }
 
-              _makeModel(map,_modelFileNameController.text,_modelRootNameController.text,_allString,_needFinal);
+              _makeModel(_jsonMap,_modelFileNameController.text,_modelRootNameController.text,_allString,_needFinal);
             },
           ),
           const SizedBox(height: 10,),
@@ -393,7 +336,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   borderSide: BorderSide(color: Colors.amber),
                   borderRadius: BorderRadius.all(Radius.circular(0.0)),
                 ),
-                labelText: "点击'生成预览'后这里会展示生成Model",
+                labelText: "点击'生成预览/生成Model文件'后这里会展示生成Model",
                 labelStyle: TextStyle(color: Colors.black87,fontSize: 8),
                 floatingLabelStyle: TextStyle(color: Colors.amber),
                 alignLabelWithHint: false,
@@ -422,27 +365,17 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!exists) {
         await _file.create();
         _writeJSON(_file,data);
+        _tipsBox('$_file文件创建成功',Colors.green);
       }else{
         if(fileOverwriteAlreadyExists){
-          print({'!!$_file文件进行覆盖!!'});
           _writeJSON(_file,data);
+          _tipsBox('!!$_file文件进行覆盖!!',Colors.green);
         }else{
-          print({'!!$_file文件已存在!!'});
+          _tipsBox('!!$_file文件已存在,请打开覆盖选项或自行修改文件!!',Colors.red[400]!);
         }
       }
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          action: SnackBarAction(label: "了解!",onPressed: (){
-            ScaffoldMessenger.of(context).clearSnackBars();
-          },),
-          content:const Text('Model文件创建成功',style: TextStyle(fontSize: 12),),
-          backgroundColor: Colors.green,
-          padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
-        ),
-      );
     }catch(e){
-      print(e);
+      _tipsBox(e.toString(),Colors.red[400]!);
     }
   }
 
@@ -452,19 +385,9 @@ class _MyHomePageState extends State<MyHomePage> {
       return file.writeAsString(obj);
     }
     catch (err) {
-      print(err);
+      _tipsBox(err.toString(),Colors.red[400]!);
     }
   }
-
-  //读取文件与测试用例
-  // _readJSON() async{
-  //
-  //   File file = File("/Volumes/mac/Users/biex/Downloads/autogeneratemodel/lib/json.json");
-  //   String str = await file.readAsString();
-  //   Map _jsonMap = jsonDecode(str);
-  //   // _makeModel(_jsonMap);
-  //   // _previewModel(_jsonMap);
-  // }
 
   //制作
   _makeModel(Map map,String fileName,String modelRootName,bool allString , bool needFinal) async {
@@ -479,7 +402,10 @@ class _MyHomePageState extends State<MyHomePage> {
     for (var it in _resultList) {
       _result += it + '\n';
     }
-    _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: true);
+    setState(() {
+      _modelPreviewJsonController.text = _result;
+    });
+    _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: _allowOverride);
 
   }
 
@@ -615,4 +541,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return modelList;
   }
 
+  //提示
+  void _tipsBox(String text,Color colors){
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        action: SnackBarAction(
+          label: "了解!",
+          textColor: Colors.black,
+          onPressed: (){
+            ScaffoldMessenger.of(context).clearSnackBars();
+          },
+        ),
+        content:Text(text,style: const TextStyle(fontSize: 12),),
+        backgroundColor: colors,
+        padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
+      ),
+    );
+  }
 }
