@@ -482,6 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }else{
         //进行递归的第二层
+        print(key.toString());
         List vv = value;
         Map _insideMap;
         if(vv.first is Map){
@@ -493,7 +494,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         {
-          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: rootModelName,allString: allString ,needFinal: needFinal);
+          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: (key.toString() + "List"),allString: allString ,needFinal: needFinal);
           modelList.addAll(_resultList);
         }
 
