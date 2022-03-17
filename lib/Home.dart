@@ -494,14 +494,14 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         {
-          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: (key.toString() + "List"),allString: allString ,needFinal: needFinal);
+          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: key.toString(),allString: allString ,needFinal: needFinal);
           modelList.addAll(_resultList);
         }
 
         if(needFinal){
-          modelList.insert(modelListLength++, "\tfinal List<" + rootModelName + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          modelList.insert(modelListLength++, "\tfinal List<" + key.toString() + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
         }else{
-          modelList.insert(modelListLength++, "\tList<" + rootModelName + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          modelList.insert(modelListLength++, "\tList<" + key.toString() + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
         }
 
       }
@@ -532,7 +532,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         }
       }else{
-        modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + rootModelName + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
+        modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + key.toString() + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
       }
     });
     modelList.insert(modelListLength++, "\t\t);");//"final int? code;"
