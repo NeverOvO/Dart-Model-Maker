@@ -9,8 +9,6 @@
 - 4：个人使用中，对于最外层的data参数，在旧版本的情况下，他直接会被叫做 DataMap、DataData等，此版本，将data的参数名称特殊处理，采用rootName来定义，例：rootNameData；
 - 5：将Class名称的开头字母大写，来避免Flutter的规范化提醒，此为默认项，后续有需要会将此功能作为可选。
 
-###
-
 ## Dart模型制作简介 （Dart Model Maker ）
 
 使用递归来实现多层model，理论上支持三层以上的json，但是没测试过，之后慢慢优化修改。
