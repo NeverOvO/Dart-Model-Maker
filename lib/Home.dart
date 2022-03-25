@@ -228,6 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
+
           const SizedBox(height: 5,),
           const Divider(height: 1,color: Colors.black,),
           const SizedBox(height: 10,),
@@ -394,37 +395,49 @@ class _MyHomePageState extends State<MyHomePage> {
     List _resultList = [];
     int _recursionKey = 1;
 
+    try{
+      _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString, needFinal: needFinal);
 
-    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString, needFinal: needFinal);
-
-    //第四步写入文件
-    String _result = '';
-    for (var it in _resultList) {
-      _result += it + '\n';
+      //第四步写入文件
+      String _result = '';
+      for (var it in _resultList) {
+        _result += it + '\n';
+      }
+      setState(() {
+        _modelPreviewJsonController.text = _result;
+      });
+      _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: _allowOverride);
+    }catch(e){
+      setState(() {
+        _modelPreviewJsonController.text = "预览生成错误,错误原因为$e\n请检查Json格式是否正确,或前往https://github.com/NeverOvO/Dart-Model-Maker提交issues";
+      });
     }
-    setState(() {
-      _modelPreviewJsonController.text = _result;
-    });
-    _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: _allowOverride);
 
   }
 
   //预览
   _previewModel(Map map,String modelRootName,bool allString , bool needFinal) async{
+    _modelPreviewJsonController.text = "";
     List _resultList = [];
     int _recursionKey = 1;
 
+    try{
+      _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString ,needFinal: needFinal);
 
-    _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString ,needFinal: needFinal);
-
-    //第四步写入文件
-    String _result = '';
-    for (var it in _resultList) {
-      _result += it + '\n';
+      //第四步写入文件
+      String _result = '';
+      for (var it in _resultList) {
+        _result += it + '\n';
+      }
+      setState(() {
+        _modelPreviewJsonController.text = _result;
+      });
+    }catch(e){
+      setState(() {
+        _modelPreviewJsonController.text = "预览生成错误,错误原因为$e\n请检查Json格式是否正确,或前往https://github.com/NeverOvO/Dart-Model-Maker提交issues";
+      });
     }
-    setState(() {
-      _modelPreviewJsonController.text = _result;
-    });
+
 
   }
 
@@ -461,19 +474,33 @@ class _MyHomePageState extends State<MyHomePage> {
       if(value.runtimeType != List){
         if(value is Map){
           //如果是Map类型进行一次解析
+
+          String _className = key.toString();
+          if(_className == "data"){
+            _className = rootModelName;
+          }else{
+            _className = _toUpperCaseFirst(key.toString());
+          }
+
           {
-            List _resultList = _disassemblyModel(value,insideMapLength,rootModelName: (key.toString() + 'Map'),allString: allString , needFinal:  needFinal);
+
+            List _resultList = _disassemblyModel(value,insideMapLength + 1,rootModelName: _className,allString: allString , needFinal:  needFinal);
             modelList.addAll(_resultList);
           }
 
           if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal " + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");
+            modelList.insert(modelListLength++, "\tfinal " + _className + _insideMapTitle2 + "? " + key.toString() + ";");
           }else{
-            modelList.insert(modelListLength++, "\t" + key.toString() + 'Map' + _insideMapTitle + "? " + key.toString() + ";");
+            modelList.insert(modelListLength++, "\t" + _className + _insideMapTitle2 + "? " + key.toString() + ";");
           }
 
+        }else if(value.runtimeType.toString() == "Null"){ // 特别处理null类型
+          if(needFinal){
+            modelList.insert(modelListLength++, "\tfinal String? " + key.toString() + ";//请注意:原类型为Null");//"final int? code;"
+          }else{
+            modelList.insert(modelListLength++, "\tString? " + key.toString() + ";//请注意:原类型为Null");//"final int? code;"
+          }
         }else{
-
           if(needFinal){
             modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
           }else{
@@ -482,26 +509,41 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }else{
         //进行递归的第二层
-        print(key.toString());
         List vv = value;
         Map _insideMap;
-        if(vv.first is Map){
-          _insideMap = vv.first;
-        }else if(vv.first is String){
-          _insideMap = jsonDecode(vv.first);
+
+        String _className = key.toString();
+        if(_className == "data"){
+          _className = rootModelName;
         }else{
-          _insideMap = {};//这里就不进行处理了 让用户自己搞定
+          _className = _toUpperCaseFirst(key.toString());
         }
 
-        {
-          List _resultList = _disassemblyModel(_insideMap,insideMapLength + 1,rootModelName: key.toString(),allString: allString ,needFinal: needFinal);
-          modelList.addAll(_resultList);
-        }
-
-        if(needFinal){
-          modelList.insert(modelListLength++, "\tfinal List<" + key.toString() + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+        if(vv.isEmpty){ // 数组为空时直接将其定义为普通数组
+          if(needFinal){
+            modelList.insert(modelListLength++, "\tfinal List? " + key.toString() + ";");//"final int? code;"
+          }else{
+            modelList.insert(modelListLength++, "\tList? " + key.toString() + ";");//"final int? code;"
+          }
         }else{
-          modelList.insert(modelListLength++, "\tList<" + key.toString() + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          if(vv.first is Map){
+            _insideMap = vv.first;
+          }else if(vv.first is String){
+            _insideMap = jsonDecode(vv.first);
+          }else{
+            _insideMap = {};//这里就不进行处理了 让用户自己搞定
+          }
+
+          {
+            List _resultList = _disassemblyModel( _insideMap,insideMapLength + 1,rootModelName: _className,allString: allString ,needFinal: needFinal);
+            modelList.addAll(_resultList);
+          }
+
+          if(needFinal){
+            modelList.insert(modelListLength++, "\tfinal List<" + _className + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          }else{
+            modelList.insert(modelListLength++, "\tList<" + _className + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          }
         }
 
       }
@@ -521,18 +563,35 @@ class _MyHomePageState extends State<MyHomePage> {
     modelList.insert(modelListLength++, "\t\treturn " + rootModelName + _insideMapTitle +"(");//"final int? code;"
     map.forEach((key, value) {
       if(value.runtimeType != List){
-        if(value is Map){//json['mapD'] != null ? new MapD.fromJson(json['mapD']) : null;
+        if(value is Map){
+          String _className = key.toString();
+          if(_className == "data"){
+            _className = rootModelName;
+          }else{
+            _className = _toUpperCaseFirst(key.toString());
+          }
           modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : "
-              + "json['" + key.toString() + "'] != null ? " + key.toString() + 'Map' + _insideMapTitle + ".fromJson(json['" + key.toString() + "']) : null,");
+              + "json['" + key.toString() + "'] != null ? " + _className + _insideMapTitle2 + ".fromJson(json['" + key.toString() + "']) : null,");
         }else{
-          if(key.runtimeType == String || allString){
+          if(value.runtimeType == String || allString || value.runtimeType.toString() == "Null"){
             modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'].toString(),");
           }else{
             modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'],");
           }
         }
       }else{
-        modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + key.toString() + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
+        String _className = key.toString();
+        if(_className == "data"){
+          _className = rootModelName;
+        }else{
+          _className = _toUpperCaseFirst(key.toString());
+        }
+        List vv = value;
+        if(vv.isEmpty){
+          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : json['" + key.toString() + "'],");//"final int? code;"
+        }else{
+          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + _className + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
+        }
       }
     });
     modelList.insert(modelListLength++, "\t\t);");//"final int? code;"
@@ -559,5 +618,9 @@ class _MyHomePageState extends State<MyHomePage> {
         padding:const EdgeInsets.fromLTRB(10, 15, 10, 15),
       ),
     );
+  }
+
+  String _toUpperCaseFirst(String name){
+    return name[0].toUpperCase() + name.substring(1);
   }
 }
