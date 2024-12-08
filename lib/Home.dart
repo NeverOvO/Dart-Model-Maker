@@ -6,10 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const double myFontSize = 13;
+const double myFontSize = 12;
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -30,6 +30,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _needFinal = true;
 
+  bool _needToJson = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,8 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Row(
           children: [
             Expanded(
-              child: _leftWidget(),
               flex: 2,
+              child: _leftWidget(),
             ),
             const VerticalDivider(width: 1,color: Colors.black,),
             Expanded(
@@ -152,109 +154,145 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Colors.white,
       child: Column(
         children: [
-          const Text("基本选项",style: TextStyle(fontSize: myFontSize + 2,fontWeight: FontWeight.w600),),
-          const SizedBox(height: 5,),
-          const Divider(height: 1,color: Colors.black,),
-          const SizedBox(height: 5,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Text("允许文件覆盖",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
-                  IconButton(
-                    onPressed: (){
-                      _tipsBox('启用此选项后，将允许直接覆盖同名文件；关闭后，将提示用户进行修改',Colors.orange);
-                    },
-                    icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
-                ],
-              ),
-              CupertinoSwitch(
-                value: _allowOverride,
-                onChanged:(e){
-                  setState(() {
-                    _allowOverride = e;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 10,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Text("启用类型全String",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
-                  IconButton(
-                    onPressed: (){
-                      _tipsBox('启用此选项后，将除了List，Map类型外的其他参数类型转换为String类型；关闭后，将使用参数的原本类型',Colors.orange);
-                    },
-                    icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
-                ],
-              ),
-              CupertinoSwitch(
-                value: _allString,
-                onChanged:(e){
-                  setState(() {
-                    _allString = e;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 10,),
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Text("final修饰词",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
-                  IconButton(
-                    onPressed: (){
-                      _tipsBox('启用此选项后，将在参数前添加final，例如final String? id；关闭后为String? id',Colors.orange);
-                    },
-                    icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
-                ],
-              ),
-              CupertinoSwitch(
-                value: _needFinal,
-                onChanged:(e){
-                  setState(() {
-                    _needFinal = e;
-                  });
-                },
-              ),
-            ],
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+            decoration: BoxDecoration(
+              color: Colors.amberAccent.withOpacity(0.1),
+              borderRadius: BorderRadius.all(Radius.circular(3.0)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Text("允许文件覆盖",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
+                        IconButton(
+                          onPressed: (){
+                            _tipsBox('启用此选项后，将允许直接覆盖同名文件；关闭后，将提示用户进行修改',Colors.orange);
+                          },
+                          icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: CupertinoSwitch(
+                        value: _allowOverride,
+                        onChanged:(e){
+                          setState(() {
+                            _allowOverride = e;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Text("启用类型全String",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
+                        IconButton(
+                          onPressed: (){
+                            _tipsBox('启用此选项后，将除了List，Map类型外的其他参数类型转换为String类型；关闭后，将使用参数的原本类型',Colors.orange);
+                          },
+                          icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: CupertinoSwitch(
+                        value: _allString,
+                        onChanged:(e){
+                          setState(() {
+                            _allString = e;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Text("final修饰词",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
+                        IconButton(
+                          onPressed: (){
+                            _tipsBox('启用此选项后，将在参数前添加final，例如final String? id；关闭后为String? id',Colors.orange);
+                          },
+                          icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: CupertinoSwitch(
+                        value: _needFinal,
+                        onChanged:(e){
+                          setState(() {
+                            _needFinal = e;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Text("ToJson功能",style: TextStyle(fontSize: myFontSize,fontWeight: FontWeight.w600)),
+                        IconButton(
+                          onPressed: (){
+                            _tipsBox('启用此选项后，将生成ToJson模块，支持model类转换为Map/JSON；关闭后不额外生成',Colors.orange);
+                          },
+                          icon: const Icon(Icons.question_answer,color: Colors.orangeAccent,size: 15,),),
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: CupertinoSwitch(
+                        value: _needToJson,
+                        onChanged:(e){
+                          setState(() {
+                            _needToJson = e;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 5,),
-          const Divider(height: 1,color: Colors.black,),
-          const SizedBox(height: 10,),
-
-          ElevatedButton(
+          InkWell(
             child: Container(
-              child: const Text("生成预览(长按复制)",maxLines: 1,overflow: TextOverflow.ellipsis,softWrap: true,),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(0.5),
+                borderRadius: BorderRadius.all(Radius.circular(3.0)),
+              ),
               padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
               alignment: Alignment.center,
+              child: const Text("生成预览(长按复制)",style: TextStyle(color: Colors.black87),),
             ),
-            style: ElevatedButton.styleFrom(
-              primary: Colors.amber,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            onPressed: () async{
+            onTap: () async{
 
               if(_modelJsonController.text == ""){
                 _tipsBox('请输入接口报文JSON',Colors.orange);
                 return;
               }
 
-              Map _jsonMap;
+              Map jsonMap;
               try{
-                _jsonMap = jsonDecode(_modelJsonController.text);
+                jsonMap = jsonDecode(_modelJsonController.text);
               }catch(e){
                 _tipsBox('JSON转Map失败，请检查JSON字符串格式',Colors.red[400]!);
                 return;
@@ -265,7 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return;
               }
 
-              _previewModel(_jsonMap,_modelRootNameController.text,_allString,_needFinal);
+              _previewModel(jsonMap,_modelRootNameController.text);
             },
 
             onLongPress: (){
@@ -279,19 +317,17 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           const SizedBox(height: 10,),
-          ElevatedButton(
+          InkWell(
             child: Container(
-              child: const Text("生成Model文件",maxLines: 1,overflow: TextOverflow.ellipsis,softWrap: true,),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.5),
+                borderRadius: BorderRadius.all(Radius.circular(3.0)),
+              ),
               padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
               alignment: Alignment.center,
+              child: const Text("生成Model文件",style: TextStyle(color: Colors.black87),),
             ),
-            style: ElevatedButton.styleFrom(
-              primary: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            onPressed: (){
+            onTap: (){
 
               if(_modelFileNameController.text == ""){
                 _tipsBox('请输入文件名', Colors.orange);
@@ -303,9 +339,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 return;
               }
 
-              Map _jsonMap;
+              Map jsonMap;
               try{
-                _jsonMap = jsonDecode(_modelJsonController.text);
+                jsonMap = jsonDecode(_modelJsonController.text);
               }catch(e){
                 _tipsBox('JSON转Map失败，请检查JSON字符串格式', Colors.red[400]!);
                 return;
@@ -316,7 +352,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return;
               }
 
-              _makeModel(_jsonMap,_modelFileNameController.text,_modelRootNameController.text,_allString,_needFinal);
+              _makeModel(jsonMap,_modelFileNameController.text,_modelRootNameController.text);
             },
           ),
           const SizedBox(height: 10,),
@@ -360,19 +396,19 @@ class _MyHomePageState extends State<MyHomePage> {
   //创建文件的主入口
   void _createFile(String data,{String fileName = 'automodel',bool fileOverwriteAlreadyExists = false}) async {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();// file_picker: ^4.4.0
-    File _file = File('$selectedDirectory/$fileName.dart');
+    File file = File('$selectedDirectory/$fileName.dart');
     try{
-      bool exists = await _file.exists();
+      bool exists = await file.exists();
       if (!exists) {
-        await _file.create();
-        _writeJSON(_file,data);
-        _tipsBox('$_file文件创建成功',Colors.green);
+        await file.create();
+        _writeJSON(file,data);
+        _tipsBox('$file文件创建成功',Colors.green);
       }else{
         if(fileOverwriteAlreadyExists){
-          _writeJSON(_file,data);
-          _tipsBox('!!$_file文件进行覆盖!!',Colors.green);
+          _writeJSON(file,data);
+          _tipsBox('!!$file文件进行覆盖!!',Colors.green);
         }else{
-          _tipsBox('!!$_file文件已存在,请打开覆盖选项或自行修改文件!!',Colors.red[400]!);
+          _tipsBox('!!$file文件已存在,请打开覆盖选项或自行修改文件!!',Colors.red[400]!);
         }
       }
     }catch(e){
@@ -391,22 +427,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //制作
-  _makeModel(Map map,String fileName,String modelRootName,bool allString , bool needFinal) async {
-    List _resultList = [];
-    int _recursionKey = 1;
+  _makeModel(Map map,String fileName,String modelRootName) async {
+    List resultList = [];
+    int recursionKey = 1;
 
     try{
-      _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString, needFinal: needFinal);
+      resultList = await _disassemblyModel(map, recursionKey, rootModelName: modelRootName);
 
       //第四步写入文件
-      String _result = '';
-      for (var it in _resultList) {
-        _result += it + '\n';
+      String result = '';
+      for (var it in resultList) {
+        result += it + '\n';
       }
       setState(() {
-        _modelPreviewJsonController.text = _result;
+        _modelPreviewJsonController.text = result;
       });
-      _createFile(_result, fileName: fileName, fileOverwriteAlreadyExists: _allowOverride);
+      _createFile(result, fileName: fileName, fileOverwriteAlreadyExists: _allowOverride);
     }catch(e){
       setState(() {
         _modelPreviewJsonController.text = "预览生成错误,错误原因为$e\n请检查Json格式是否正确,或前往https://github.com/NeverOvO/Dart-Model-Maker提交issues";
@@ -416,21 +452,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //预览
-  _previewModel(Map map,String modelRootName,bool allString , bool needFinal) async{
+  _previewModel(Map map,String modelRootName) async{
     _modelPreviewJsonController.text = "";
-    List _resultList = [];
-    int _recursionKey = 1;
+    List resultList = [];
+    int recursionKey = 1;
 
     try{
-      _resultList = await _disassemblyModel(map, _recursionKey, rootModelName: modelRootName, allString: allString ,needFinal: needFinal);
+      resultList = await _disassemblyModel(map, recursionKey, rootModelName: modelRootName);
 
       //第四步写入文件
-      String _result = '';
-      for (var it in _resultList) {
-        _result += it + '\n';
+      String result = '';
+      for (var it in resultList) {
+        result += it + '\n';
       }
       setState(() {
-        _modelPreviewJsonController.text = _result;
+        _modelPreviewJsonController.text = result;
       });
     }catch(e){
       setState(() {
@@ -442,30 +478,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //原json，递归层数，model根姓名，是否除List外全部使用String
-  _disassemblyModel(Map map,int insideMapLength,{String rootModelName = 'Automatic' , bool allString = false ,bool needFinal = true}){
+  _disassemblyModel(Map map,int insideMapLength,{String rootModelName = 'Automatic'}){
 
     List modelList = [];
     int modelListLength = 0;
 
-    String _insideMapTitle = 'Model';
-    String _insideMapTitle2 = 'Data';
+    String insideMapTitle = 'Model';
+    String insideMapTitle2 = 'Data';
 
     if(insideMapLength == 1){
-      _insideMapTitle = 'Model';
-      _insideMapTitle2 = 'Data';
+      insideMapTitle = 'Model';
+      insideMapTitle2 = 'Data';
     }else if(insideMapLength == 2){
-      _insideMapTitle = 'Data';
-      _insideMapTitle2 = 'ListData';
+      insideMapTitle = 'Data';
+      insideMapTitle2 = 'ListData';
     }else if(insideMapLength == 3){
-      _insideMapTitle = 'ListData';
-      _insideMapTitle2 = 'Inside' + (insideMapLength+1).toString() +'Data';
+      insideMapTitle = 'ListData';
+      insideMapTitle2 = 'Inside${insideMapLength+1}Data';
     }else{
-      _insideMapTitle = 'Inside' + insideMapLength.toString() +'Data';
-      _insideMapTitle2 = 'Inside' + (insideMapLength+1).toString() +'Data';
+      insideMapTitle = 'Inside${insideMapLength}Data';
+      insideMapTitle2 = 'Inside${insideMapLength+1}Data';
     }
 
     //新增头
-    modelList.add("class " + rootModelName + _insideMapTitle + "{");
+    modelList.add("class $rootModelName$insideMapTitle{");
     modelListLength ++;
 
     //开始解析第一层
@@ -475,74 +511,73 @@ class _MyHomePageState extends State<MyHomePage> {
         if(value is Map){
           //如果是Map类型进行一次解析
 
-          String _className = key.toString();
-          if(_className == "data"){
-            _className = rootModelName;
+          String className = key.toString();
+          if(className == "data"){
+            className = rootModelName;
           }else{
-            _className = _toUpperCaseFirst(key.toString());
+            className = _toUpperCaseFirst(key.toString());
           }
 
           {
-
-            List _resultList = _disassemblyModel(value,insideMapLength + 1,rootModelName: _className,allString: allString , needFinal:  needFinal);
-            modelList.addAll(_resultList);
+            List resultList = _disassemblyModel(value,insideMapLength + 1,rootModelName: className);
+            modelList.addAll(resultList);
           }
 
-          if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal " + _className + _insideMapTitle2 + "? " + key.toString() + ";");
+          if(_needFinal){
+            modelList.insert(modelListLength++, "\tfinal $className$insideMapTitle2? $key;");
           }else{
-            modelList.insert(modelListLength++, "\t" + _className + _insideMapTitle2 + "? " + key.toString() + ";");
+            modelList.insert(modelListLength++, "\t$className$insideMapTitle2? $key;");
           }
 
         }else if(value.runtimeType.toString() == "Null"){ // 特别处理null类型
-          if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal String? " + key.toString() + ";//请注意:原类型为Null");//"final int? code;"
+          if(_needFinal){
+            modelList.insert(modelListLength++, "\tfinal String? $key;//请注意:原类型为Null");//"final int? code;"
           }else{
-            modelList.insert(modelListLength++, "\tString? " + key.toString() + ";//请注意:原类型为Null");//"final int? code;"
+            modelList.insert(modelListLength++, "\tString? $key;//请注意:原类型为Null");//"final int? code;"
           }
         }else{
-          if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal " + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+          if(_needFinal){
+            modelList.insert(modelListLength++, "\tfinal ${_allString ? "String" : value.runtimeType.toString()}? $key;");//"final int? code;"
           }else{
-            modelList.insert(modelListLength++, "\t" + (allString ? "String" : value.runtimeType.toString()) + "? " + key.toString() + ";");//"final int? code;"
+            modelList.insert(modelListLength++, "\t${_allString ? "String" : value.runtimeType.toString()}? $key;");//"final int? code;"
           }
         }
       }else{
         //进行递归的第二层
         List vv = value;
-        Map _insideMap;
+        Map insideMap;
 
-        String _className = key.toString();
-        if(_className == "data"){
-          _className = rootModelName;
+        String className = key.toString();
+        if(className == "data"){
+          className = rootModelName;
         }else{
-          _className = _toUpperCaseFirst(key.toString());
+          className = _toUpperCaseFirst(key.toString());
         }
 
         if(vv.isEmpty){ // 数组为空时直接将其定义为普通数组
-          if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal List? " + key.toString() + ";");//"final int? code;"
+          if(_needFinal){
+            modelList.insert(modelListLength++, "\tfinal List? $key;");//"final int? code;"
           }else{
-            modelList.insert(modelListLength++, "\tList? " + key.toString() + ";");//"final int? code;"
+            modelList.insert(modelListLength++, "\tList? $key;");//"final int? code;"
           }
         }else{
           if(vv.first is Map){
-            _insideMap = vv.first;
+            insideMap = vv.first;
           }else if(vv.first is String){
-            _insideMap = jsonDecode(vv.first);
+            insideMap = jsonDecode(vv.first);
           }else{
-            _insideMap = {};//这里就不进行处理了 让用户自己搞定
+            insideMap = {};//这里就不进行处理了 让用户自己搞定
           }
 
           {
-            List _resultList = _disassemblyModel( _insideMap,insideMapLength + 1,rootModelName: _className,allString: allString ,needFinal: needFinal);
-            modelList.addAll(_resultList);
+            List resultList = _disassemblyModel( insideMap,insideMapLength + 1,rootModelName: className);
+            modelList.addAll(resultList);
           }
 
-          if(needFinal){
-            modelList.insert(modelListLength++, "\tfinal List<" + _className + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+          if(_needFinal){
+            modelList.insert(modelListLength++, "\tfinal List<$className$insideMapTitle2>? $key;");//"final int? code;"
           }else{
-            modelList.insert(modelListLength++, "\tList<" + _className + _insideMapTitle2 +">? " + key.toString() + ";");//"final int? code;"
+            modelList.insert(modelListLength++, "\tList<$className$insideMapTitle2>? $key;");//"final int? code;"
           }
         }
 
@@ -551,51 +586,65 @@ class _MyHomePageState extends State<MyHomePage> {
     modelList.insert(modelListLength++, "");
 
     //第二步，生成Constructor
-    String _k1String = '';
+    String k1String = '';
     map.forEach((key, value) {
-      _k1String += 'this.' + key + ", ";
+      k1String += "${'this.' + key},";
     });
-    modelList.insert(modelListLength++, "\t" + rootModelName + _insideMapTitle +"({" + _k1String + '});');//"final int? code;"
+    modelList.insert(modelListLength++, "\t" + rootModelName + insideMapTitle +"({" + k1String + '});');//"final int? code;"
 
     //第三步生成工厂类
     modelList.insert(modelListLength++, "");
-    modelList.insert(modelListLength++, "\tfactory " + rootModelName + _insideMapTitle +".fromJson(Map<dynamic, dynamic> json) {");//"final int? code;"
-    modelList.insert(modelListLength++, "\t\treturn " + rootModelName + _insideMapTitle +"(");//"final int? code;"
+    modelList.insert(modelListLength++, "\tfactory $rootModelName$insideMapTitle.fromJson(Map<dynamic, dynamic> json) {");//"final int? code;"
+    modelList.insert(modelListLength++, "\t\treturn $rootModelName$insideMapTitle(");//"final int? code;"
     map.forEach((key, value) {
       if(value.runtimeType != List){
         if(value is Map){
-          String _className = key.toString();
-          if(_className == "data"){
-            _className = rootModelName;
+          String className = key.toString();
+          if(className == "data"){
+            className = rootModelName;
           }else{
-            _className = _toUpperCaseFirst(key.toString());
+            className = _toUpperCaseFirst(key.toString());
           }
-          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : "
-              + "json['" + key.toString() + "'] != null ? " + _className + _insideMapTitle2 + ".fromJson(json['" + key.toString() + "']) : null,");
+          modelList.insert(modelListLength++, "\t\t\t$key : json['$key'] != null ? $className$insideMapTitle2.fromJson(json['$key']) : null,");
         }else{
-          if(value.runtimeType == String || allString || value.runtimeType.toString() == "Null"){
-            modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'].toString(),");
+          if(value.runtimeType == String || _allString || value.runtimeType.toString() == "Null"){
+            modelList.insert(modelListLength++, "\t\t\t$key : json['$key'].toString(),");
           }else{
-            modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : " + "json['" + key.toString() + "'],");
+            modelList.insert(modelListLength++, "\t\t\t$key : json['$key'],");
           }
         }
       }else{
-        String _className = key.toString();
-        if(_className == "data"){
-          _className = rootModelName;
+        String className = key.toString();
+        if(className == "data"){
+          className = rootModelName;
         }else{
-          _className = _toUpperCaseFirst(key.toString());
+          className = _toUpperCaseFirst(key.toString());
         }
         List vv = value;
         if(vv.isEmpty){
-          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : json['" + key.toString() + "'],");//"final int? code;"
+          modelList.insert(modelListLength++, "\t\t\t$key : json['$key'],");//"final int? code;"
         }else{
-          modelList.insert(modelListLength++, "\t\t\t" + key.toString() + " : (json['" + key.toString() + "'] as List).map((i) => " + _className + _insideMapTitle2 +".fromJson(i)).toList(),");//"final int? code;"
+          modelList.insert(modelListLength++, "\t\t\t$key : (json['$key'] as List).map((i) => $className$insideMapTitle2.fromJson(i)).toList(),");//"final int? code;"
         }
       }
     });
     modelList.insert(modelListLength++, "\t\t);");//"final int? code;"
     modelList.insert(modelListLength++, "\t}");//"final int? code;"
+
+    if(_needToJson){
+      //第四部生产ToJSon
+      modelList.insert(modelListLength++, "");
+      modelList.insert(modelListLength++, "\tMap<String,dynamic> toJson(){");
+      modelList.insert(modelListLength++, "\t\tfinal Map<String,dynamic> jsonMap = <String,dynamic>{");
+      map.forEach((key, value) {
+        modelList.insert(modelListLength++, "\t\t\t\"$key\" : $key,");
+      });
+      modelList.insert(modelListLength++, "\t\t};");
+      modelList.insert(modelListLength++, "\t\treturn jsonMap;");
+      modelList.insert(modelListLength++, "\t}");
+    }
+
+    //结尾
     modelList.insert(modelListLength++, "}");//"final int? code;"
     modelList.insert(modelListLength++, "");
     return modelList;
